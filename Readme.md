@@ -7,6 +7,7 @@ Just add grovy-all*.jar to your project and Groovy runs.
 Why database migrations?
 ------------------------
 Please take a look at
+ 
  * http://www.codinghorror.com/blog/2008/02/get-your-database-under-version-control.html
  * http://odetocode.com/blogs/scott/archive/2008/01/30/three-rules-for-database-work.aspx
  * http://wap.ecw.de/archives/1665
