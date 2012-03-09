@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS test;
+CREATE TABLE test(test char(255));
