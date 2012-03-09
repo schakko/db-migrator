@@ -23,44 +23,53 @@ db-migrator provides two strategies which are most commonly used.
 
 1. Flat structure
 Your migration scripts must reside in one directory, for example
-/migrations
-	/20120307-001_any_name_of_file.sql
-	/20120308-001_blah.sql
-	/20120308-002_blah.sql
-/views
-	/20120307-001_v1.sql
-	/20120308-002_v2.sql
-/coredata
-	/20120305-001_bla.sql
-	/20120307-001_data.sql
-/fixtures
-	/20120307-001_fixtures.sql
+
+	/migrations
+		/20120307-001_any_name_of_file.sql
+		/20120308-001_blah.sql
+		/20120308-002_blah.sql
+	/views
+		/20120307-001_v1.sql
+		/20120308-002_v2.sql
+	/coredata
+		/20120305-001_bla.sql
+		/20120307-001_data.sql
+	/fixtures
+		/20120307-001_fixtures.sql
 
 To apply every (!) script from current installed migration to the newest available, you must use
+
 	groovy <path-to/>migrate-mysql -u user -p password -d database --strategy=flat ./migrations
+
 Your SQL scripts inside /migrations directory must use an ALTER TABLE syntax
 
 To apply only the latest script for coredata, you must use
+
 	groovy <path-to/>migrate-mysql -u user -p password -d database --strategy=flat ./coredata,latest
+
 Only the latest available (20120307-001_data.sql) migration script will be applied.
 Your SQL scripts should contain a DELETE FROM * at the beginning of the SQL script to get into a consistent state
 
 To automatically install the migration without writing an INSET INTO migrations(...) at the end of every migration script, you must append a true after the directory
+
 	groovy <path-to/>migrate-mysql -u user -p password -d database --strategy=flat ./coredata,latest,true
 
 If you want to apply a migration over more than one directory, you must separate the directories with a semicolon
+
 	groovy <path-to/>migrate-mysql -u user -p password -d database --strategy=flat ./migrations,all,true;./views,all,true;./coredata,latest,true
 
 Important: By default you must use the filename convention yyyymmdd-<number>bla.sql
 
 2. Hierarchial structure
 Your migration scripts resides in subdirectory:
-/migrations
-	/major
-		/minor
-			0001_blah.sql
+
+	/migrations
+		/major
+			/minor
+				0001_blah.sql
 
 Use the strategy 'hierarchial' to handle this convention
+
 	groovy <path-to/>migrate-mysql -u user -p password -d database --strategy=hierarchial ./migrations,latest,true
 
 	
