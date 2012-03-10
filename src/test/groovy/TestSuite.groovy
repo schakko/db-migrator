@@ -10,5 +10,7 @@ gsuite.addTestSuite(gsuite.compile("de/ckl/dbmigration/strategy/FlatTest.groovy"
 gsuite.addTestSuite(gsuite.compile("de/ckl/dbmigration/target/mysql/ExecutorTest.groovy"))
 gsuite.addTestSuite(gsuite.compile("de/ckl/dbmigration/target/mysql/DBInterfaceTest.groovy"))
 gsuite.addTestSuite(gsuite.compile("de/ckl/dbmigration/target/mysql/ParserTest.groovy"))
+gsuite.addTestSuite(gsuite.compile("de/ckl/dbmigration/target/mssql/ExecutorTest.groovy"))
+gsuite.addTestSuite(gsuite.compile("de/ckl/dbmigration/target/mssql/DBInterfaceTest.groovy"))
 
 TestRunner.run(gsuite)

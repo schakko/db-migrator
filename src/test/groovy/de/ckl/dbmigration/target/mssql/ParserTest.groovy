@@ -1,7 +1,6 @@
-package de.ckl.dbmigration.target.mysql
+package de.ckl.dbmigration.target.mssql
 import groovy.util.GroovyTestCase
-import de.ckl.dbmigration.Guard
-import de.ckl.dbmigration.Migrator
+import de.ckl.dbmigration.*
 import de.ckl.dbmigration.strategy.*
 
 class ParserTest extends GroovyTestCase {

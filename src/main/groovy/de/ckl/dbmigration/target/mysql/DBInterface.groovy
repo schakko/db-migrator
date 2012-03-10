@@ -9,7 +9,7 @@ class DBInterface {
 		sql_major_col = 'major',
 		sql_minor_col = 'minor',
 		sql_latest_migration = 'SELECT ' + sql_major_col + ', ' + sql_minor_col + ' FROM migrations ORDER BY ' + sql_major_col + ' DESC, ' + sql_minor_col + ' DESC LIMIT 1',
-		sql_create_migration = 'CREATE TABLE migrations(id INT NOT NULL auto_increment, installed_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, ' + sql_major_col + ' char(8), ' + sql_minor_col + ' char(8), file longtext, PRIMARY KEY(id))'
+		sql_create_migration = 'CREATE TABLE migrations(id INT NOT NULL auto_increment, installed_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, ' + sql_major_col + ' char(8), ' + sql_minor_col + ' char(8), filename longtext, PRIMARY KEY(id))'
 	
 	/**
 	 * Returns the latest migration found in database

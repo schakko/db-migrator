@@ -1,16 +1,54 @@
-package de.ckl.dbmigration.target.mysql
+package de.ckl.dbmigration.target.mssql
 
 /**
  * Low-level interface for interacting between the migration layer and the DBMS.
- * For simplification I decided to use the mysql command for interaction.
  */
 class Executor {
 	def host = 'localhost', 
 		database = '', 
-		username = 'root', 
+		username = 'Administrator', 
 		password = '', 
-		command = 'mysql', args = ''
+		command = 'osql', args = ''
 
+	def build_exec_command_default(verbose = false) {
+		def sb = new StringBuffer()
+		sb.append(command)
+		
+		if (host) {
+			sb.append(" -S ")
+			sb.append(host)
+		}
+		
+		if (username) {
+			sb.append(" -U ")
+			sb.append(username)
+
+			if (password) {
+				sb.append(" -P ")
+				sb.append(password)
+			}
+		
+		} else {
+			// if no username is set, use trusted connection
+			sb.append(" -E")
+		}
+		
+		sb.append(" ")
+		sb.append(args)
+		sb.append(" ")
+
+		if (verbose) {
+			sb.append(" -V 10")
+		}
+		
+		if (database) {
+			sb.append("-d ")
+			sb.append(database)
+		}
+		
+		return sb
+	}
+	
 	/**
 	 * creates a string which can be executed
 	 * @param cmd SQL statement to execute, use single quotation
@@ -18,49 +56,28 @@ class Executor {
 	 * @return String
 	 */
 	def build_exec_command(cmd, verbose = false) {
-		def sb = new StringBuffer()
-		sb.append(command)
+		def sb = build_exec_command_default(verbose)
 		
-		if (host) {
-			sb.append(" --host=")
-			sb.append(host)
-		}
-		
-		sb.append(" --password=")
-		sb.append(password)
-		
-		if (username) {
-			sb.append(" --user=")
-			sb.append(username)
-		}
-		
-		sb.append(" ")
-		sb.append(args)
-		sb.append(" ")
-
-		sb.append(" --vertical")
-
-		if (verbose) {
-			sb.append(" --verbose")
-		}
-		
-		sb.append(" -e ")
+		sb.append(" -Q ")
 		sb.append("\"")
 		sb.append(cmd)
 		sb.append("\"")
 		sb.append(" ")
-		sb.append(database)
 
 		return sb.toString()
 	}
 	
 	/**
-	 * Executes the given path as a MySQL script
+	 * Executes the given path as a MSSQL script
 	 * @param path absolute path to the SQL script
 	 * @return Output from command line
 	 */
 	def exec_file(path) {
-		return exec(build_exec_command("\\.source " + path, true)) 
+		def sb = build_exec_command_default(verbose)
+		sb.append(" -i ")
+		sb.append(path)
+
+		return exec(sb.toString()) 
 	}
 	
 	/**

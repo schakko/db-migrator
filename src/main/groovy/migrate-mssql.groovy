@@ -1,5 +1,5 @@
 import de.ckl.dbmigration.Version
-import de.ckl.dbmigration.target.mysql.*
+import de.ckl.dbmigration.target.mssql.*
 import de.ckl.dbmigration.Migrator
 
 try {
