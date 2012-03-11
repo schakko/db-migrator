@@ -21,7 +21,7 @@ class ExecutorTest extends GroovyTestCase {
 		o.args = '--ssl-enabled=true'
 		
 		def r = o.build_exec_command("cmd", true)
-		
-		assertTrue(r.matches(/osql\s+\-S\s+host\s+\-P\s+password\s+\-U\s+username\s+\-\-ssl\-enabled=true\s+\-V\s+10\s+\-Q\s+\"cmd\"\s+/));
+
+		assertTrue(r.matches(/osql\s+\-S\s+host\s+\-U\s+username\s+\-P\s+password\s+\-\-ssl\-enabled=true\s+\-V\s+10\s+\-Q\s+\"cmd\"\s+/));
 	}
 }

@@ -1,9 +1,16 @@
 db-migrator
 ===========
 db-migrator provides an easy interface to apply SQL migration scripts to a database of your choice.
-I chose Groovy because it is platform independent (only Java runtime required) and you don't have to install Groovy on your customers server.
+I chose Groovy because it is platform independent (only Java runtime required) and you don not have to install Groovy on your customers server.
 Just add grovy-all*.jar to your project and Groovy runs.
 
+Features
+--------
+
+ * Support for Microsoft SQL Server (osql), MySQL (mysql) and PostgreSQL (psql)
+ * Easy handling and customizing
+ * Execution of flat and hierarchial migration directory structure 
+ 
 Why database migrations?
 ------------------------
 Please take a look at
@@ -14,6 +21,12 @@ Please take a look at
  * http://blog.schauderhaft.de/2012/01/15/tipps-for-testing-database-code/
  
 to get an idea why this is useful ;-)
+
+Other tools
+----------
+
+ * http://www.liquibase.org
+
 
 How to use?
 -----------

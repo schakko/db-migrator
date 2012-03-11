@@ -17,6 +17,12 @@ class Factory {
 				migrator.dbinterface.executor = new de.ckl.dbmigration.target.mssql.Executor()
 				migrator.applier = [dbinterface: migrator.dbinterface] as de.ckl.dbmigration.target.mssql.Applier
 				break
+			case 'postgresql':
+				migrator.dbinterface = new de.ckl.dbmigration.target.postgresql.DBInterface()
+				migrator.dbinterface.executor = new de.ckl.dbmigration.target.postgresql.Executor()
+				migrator.applier = [dbinterface: migrator.dbinterface] as de.ckl.dbmigration.target.postgresql.Applier
+				break
+	
 			default:
 				throw new Exception("Target name " + targetName + " is not valid")
 		}
