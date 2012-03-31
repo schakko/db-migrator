@@ -9,49 +9,44 @@ class Executor {
 		database = '', 
 		username = 'root', 
 		password = '', 
-		command = 'mysql', args = ''
+		command = 'mysql',
+		args = ''
 
 	/**
 	 * creates a string which can be executed
 	 * @param cmd SQL statement to execute, use single quotation
 	 * @param verbose Enable/Disable verbose mode of mysql command
-	 * @return String
+	 * @return Array
 	 */
 	def build_exec_command(cmd, verbose = false) {
-		def sb = new StringBuffer()
-		sb.append(command)
+		def r = []
+		r.push(command)
 		
 		if (host) {
-			sb.append(" --host=")
-			sb.append(host)
+			r.push("--host=" + host)
 		}
 		
-		sb.append(" --password=")
-		sb.append(password)
+		r.push("--password=" + password)
 		
 		if (username) {
-			sb.append(" --user=")
-			sb.append(username)
+			r.push("--user=" + username)
 		}
 		
-		sb.append(" ")
-		sb.append(args)
-		sb.append(" ")
+		if (args) {
+			r.push(args)
+		}
 
-		sb.append(" --vertical")
+		r.push("--vertical")
 
 		if (verbose) {
-			sb.append(" --verbose")
+			r.push("--verbose")
 		}
 		
-		sb.append(" -e ")
-		sb.append("\"")
-		sb.append(cmd)
-		sb.append("\"")
-		sb.append(" ")
-		sb.append(database)
+		r.push('--execute=' + cmd) 
 
-		return sb.toString()
+		r.push(database)
+
+		return r
 	}
 	
 	/**
@@ -73,13 +68,12 @@ class Executor {
 		def proc = cmd.execute()
 		def text = proc.text
 		def err = proc.err.text
-		
 		proc.getErrorStream().close()
 		proc.getInputStream().close()
 		proc.getOutputStream().close()
 		
 		proc.waitFor()
-		
+
 		if (proc.exitValue())
 			if (err)
 				throw new Exception(err)
@@ -95,6 +89,10 @@ class Executor {
 	 * @return String
 	 */
 	def exec_command(command) {
+		if (!command.endsWith(";")) {
+			command = command + ";"
+		}
+
 		return exec(build_exec_command(command))
 	}
 }

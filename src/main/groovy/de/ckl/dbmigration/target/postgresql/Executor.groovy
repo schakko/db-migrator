@@ -11,37 +11,32 @@ class Executor {
 		command = 'psql', args = ''
 
 	def build_exec_command_default(verbose = false) {
-		def sb = new StringBuffer()
-		sb.append(command)
+		def r = []
+		r.push(command)
 		
-		sb.append(" -F=';'")
+		r.push("-F=';'")
 
 		if (host) {
-			sb.append(" --host=")
-			sb.append(host)
+			r.push("--host=" + host)
 		}
 		
 		if (username) {
-			sb.append(" --username=")
-			sb.append(username)
+			r.push("--username=" + username)
 		}
 
 		if (!password)	{				
-			sb.append(" -w")
+			r.push("-w")
 		}
 		
 		if (args) {
-			sb.append(" ")
-			sb.append(args)
-			sb.append(" ")
+			r.push(args)
 		}
 
 		if (database) {
-			sb.append(" --dbname=")
-			sb.append(database)
+			r.push(" --dbname=" + database)
 		}
 
-		return sb
+		return r
 	}
 	
 	/**
@@ -50,11 +45,10 @@ class Executor {
 	 * @return Output from command line
 	 */
 	def exec_file(path) {
-		def sb = build_exec_command_default(true)
-		sb.append(" --file=")
-		sb.append(path)
+		def r = build_exec_command_default(true)
+		r.push(" --file=" + path)
 
-		return exec(sb.toString()) 
+		return exec(r) 
 	}
 	
 	/**

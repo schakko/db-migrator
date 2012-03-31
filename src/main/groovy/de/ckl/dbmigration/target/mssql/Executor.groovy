@@ -11,60 +11,50 @@ class Executor {
 		command = 'osql', args = ''
 
 	def build_exec_command_default(verbose = false) {
-		def sb = new StringBuffer()
-		sb.append(command)
+		def r = []
+		r.push(command)
 		
 		if (host) {
-			sb.append(" -S ")
-			sb.append(host)
+			r.push("-S " + host)
 		}
 		
 		if (username) {
-			sb.append(" -U ")
-			sb.append(username)
+			r.push("-U " + username)
 
 			if (password) {
-				sb.append(" -P ")
-				sb.append(password)
+				r.push("-P " + password)
 			}
 		
 		} else {
 			// if no username is set, use trusted connection
-			sb.append(" -E")
+			r.push("-E")
 		}
 		
-		sb.append(" ")
-		sb.append(args)
-		sb.append(" ")
+		r.push(args)
 
 		if (verbose) {
-			sb.append(" -V 10")
+			r.push("-V 10")
 		}
 		
 		if (database) {
-			sb.append("-d ")
-			sb.append(database)
+			r.push("-d " + database)
 		}
 		
-		return sb
+		return r
 	}
 	
 	/**
 	 * creates a string which can be executed
 	 * @param cmd SQL statement to execute, use single quotation
 	 * @param verbose Enable/Disable verbose mode of mysql command
-	 * @return String
+	 * @return Array
 	 */
 	def build_exec_command(cmd, verbose = false) {
-		def sb = build_exec_command_default(verbose)
+		def r = build_exec_command_default(verbose)
 		
-		sb.append(" -Q ")
-		sb.append("\"")
-		sb.append(cmd)
-		sb.append("\"")
-		sb.append(" ")
+		r.push("-Q " + cmd)
 
-		return sb.toString()
+		return r
 	}
 	
 	/**

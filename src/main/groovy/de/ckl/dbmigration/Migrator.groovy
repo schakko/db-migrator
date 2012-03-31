@@ -40,7 +40,7 @@ class Migrator {
 		for (pathdef in dirs) {
 			stack.push(create_dir_element(pathdef))
 		}
-		
+			
 		applier.begin()
 		
 		for (pathdef in stack) {
@@ -50,7 +50,19 @@ class Migrator {
 			applier.prepare(candidates, pathdef.latest_only, pathdef.sql_insert_migration)
 		}
 		
-		applier.commit()
+		if (applier.total_migrations == 0) {
+			return
+		}
+
+		try {		
+			applier.commit()
+			applier.cleanup()
+			println "\033[1;32m[migration] " + applier.total_migrations + " migrations applied. Project is now up-to-date :-)"
+		}
+		catch (e) {
+			println "\033[1;31m[error] Migration failed: " + e.getMessage()
+			println "[error] SQL-script has not been deleted for debugging purposes (" + applier.tmpFile.getAbsolutePath() + ")\033[0m"
+		}
 	}
 	
 	/** 

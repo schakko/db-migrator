@@ -7,8 +7,9 @@ class Applier {
 	def dbinterface = null,
 		tmpFile = null,
 		os = null,
-		pw = null
-	
+		pw = null,
+		total_migrations = 0	
+
 	/**
 	 * Creates a temporary file which contains all SQL statements of the migration scripts.
 	 *
@@ -19,6 +20,7 @@ class Applier {
 			tmpFile = File.createTempFile("migration", ".sql")
 			os = new FileOutputStream(tmpFile)
 			pw = new PrintWriter(os)
+			total_migrations = 0
 			
 			println "[migration] output will be written to " + tmpFile.getAbsolutePath()
 			pw.println("-- migration file was created at " + new Date())
@@ -41,7 +43,7 @@ class Applier {
 		def keys = null
 		
 		if (ks.size() == 0) {
-			println "[migration] no migrations available"
+			println "\033[1;32m[migration] no migrations available - project is up-to-date :-) \033[0m"
 			return
 		}
 
@@ -54,14 +56,11 @@ class Applier {
 		
 		def size = keys.size()
 		
-	
-		def os = null, pw = null, tmpFile = null
-
-		def num = 1
 		keys.each{
 			key ->
+				++total_migrations
 				def inFile = new File(unapplied_migrations[key])
-				println "[migration] " + num + " / " + size + " " + inFile.getName() + " scheduled for applying"
+				println "\033[1;33m[migration] " + total_migrations + " / " + size + " " + inFile.getName() + " scheduled for applying\033[0m"
 				def content = inFile.readLines()
 				pw.println("-- " + inFile.getName())
 
@@ -70,11 +69,11 @@ class Applier {
 				}
 				
 				if (sql_insert_migration) {
-					pw.println("INSERT INTO migrations (major, minor, file) VALUES('" + key.major + "', '" + key.minor + "', '" + inFile.getName() + "');") 
+					pw.println("INSERT INTO migrations (major, minor, filename) VALUES('" + key.major + "', '" + key.minor + "', '" + inFile.getName() + "');") 
 				}
-				
-				num++
 		}
+
+		return true
 	}
 	
 	/**
@@ -87,8 +86,11 @@ class Applier {
 		os.close()
 
 		println dbinterface.executor.exec_file(tmpFile.getAbsolutePath())
-		
-		tmpFile.delete()
+
+	}
+
+	def cleanup() {
+		tmpFile.delete()		
 		println "[cleanup] Temporary file containing all statements deleted"
 	}
 

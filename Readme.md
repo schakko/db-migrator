@@ -85,7 +85,31 @@ Use the strategy 'hierarchial' to handle this convention
 
 	groovy <path-to/>migrate-mysql -u user -p password -d database --strategy=hierarchial ./migrations,latest,true
 
-	
+
+Shell script usage
+------------------
+
+	#!/bin/sh
+	HOST=localhost
+	USER=root
+	PASSWORD=
+	DBMIGRATOR=/path/to/migrate-mysql.groovy
+	DATABASE=your_database
+	DIR=`dirname $0`
+	if [ "$1" = "unittest" ]; then
+		DATABASE="$DATABASE_test"
+	fi
+
+	EXEC="groovy -cp `dirname $DBMIGRATOR` $DBMIGRATOR -d $DATABASE -h $HOST -u $USER -p $PASSWORD "
+	EXEC_MIGRATIONS="$EXEC $DIR/migrations,all,true"
+	R=`$EXEC_MIGRATIONS`
+
+	echo -e "$R"
+	if [ "$1" = "unittest" ]; then
+		`$EXEC $DIR/fixtures/unittest,latest`
+	fi
+
+
 Internals
 ---------
 Every script which has to be applied is concated to a temporary SQL script which is executed inside a transaction, so that ALL or NONE migrations are applied.

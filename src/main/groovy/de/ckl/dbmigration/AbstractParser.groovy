@@ -9,7 +9,7 @@ import de.ckl.dbmigration.Guard
  */
 class AbstractParser {
 	def parse(args, migrator) {
-		def cli = new CliBuilder(usage: new File(System.getProperty("script.name")).getName() + ' [options] [dir1[,range[,add_insert]][;dir2[,range[,add_insert]]...]]', header:'"range" can be "all" or "latest". "all" will apply all migrations since the latest available migration in database. "latest" means that the latest version inside the directory is taken.\nIf you set "add_insert", an INSERT statement will automatically created for your migration table. Default is "no", so you have to append the INSERT INTO migrations... in every migration script on your own\n\nHints for specific DBMS:' + get_additional_header() + '\n\nOptions')
+		def cli = new CliBuilder(usage: new File(System.getProperty("script.name")).getName() + ' [options] [dir1[,$range[,$add_insert=[true|false]]][;dir2[,$range[,$add_insert=[true|false]]]...]]', header:'"$range" can be "all" or "latest". "all" will apply all migrations since the latest available migration in database. "latest" means that the latest version inside the directory is taken.\nIf you set "$add_insert" to true, an INSERT statement will automatically created for your migration table. Default is "no", so you have to append the INSERT INTO migrations... in every migration script on your own\n\nHints for specific DBMS:' + get_additional_header() + '\n\nOptions')
 
 		cli = create_default_opts(cli)
 		
