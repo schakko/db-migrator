@@ -61,8 +61,57 @@ class Migrator {
 		}
 		catch (e) {
 			println "\033[1;31m[error] Migration failed: " + e.getMessage()
-			println "[error] SQL-script has not been deleted for debugging purposes (" + applier.tmpFile.getAbsolutePath() + ")\033[0m"
+
+			if (dbinterface.executor.getClass().metaClass.hasMetaMethod("get_linenumber_of_error")) {
+				def errorInLine = dbinterface.executor.get_linenumber_of_error(e.getMessage())
+				def stacktrace = get_sql_stacktrace(applier.tmpFile.readLines(), (errorInLine - 1), 5, 2)
+
+				println "\033[1;31m[debug] error occured somewhere in file: " + stacktrace.file 
+				println "\033[0m... lines of aggregated SQL script ..."
+				def curLine = stacktrace.beginline
+
+				stacktrace.lines.each{ item ->
+					if (curLine == errorInLine) {
+						print "\033[1;31m"
+					}
+
+					println "\t" + curLine + "\t" + item  
+					curLine++
+				}
+				println ""
+			}
+
+			println "\033[1;31m[error] SQL-script has not been deleted for debugging purposes (" + applier.tmpFile.getAbsolutePath() + ")\033[0m"
 		}
+	}
+
+	def get_sql_stacktrace(lines, idx, lines_before, lines_after) {
+		def output = [ ],
+			endline = ((idx + lines_after) > (lines.size() - 1)) ? (lines.size() - 1) : (idx + lines_after),
+			beginline = ((endline - lines_before) < 0) ? 0 : (endline - lines_before), 
+			sep = System.getProperty("line.separator"),
+			referenceFile = null 
+
+		while (endline >= 0) {
+			def currentline = lines.get(endline)
+
+			if (endline >= beginline) {
+				output.add(0, currentline)
+			}
+
+			def matcher = currentline =~ /db-migrator:FILE:(.*)/
+			if (matcher) {
+				referenceFile = matcher[0][1]
+			}
+
+			if ((endline <= beginline) && matcher) {
+				break
+			}
+
+			endline--
+		}
+
+		return ["lines": output, "file": referenceFile, "beginline": ++beginline]
 	}
 	
 	/** 

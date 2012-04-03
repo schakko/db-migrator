@@ -38,4 +38,28 @@ class MigratorTest extends GroovyTestCase {
 		assertTrue(r.latest_only == true)
 		assertTrue(r.sql_insert_migration == true)
 	}
+
+	void test_get_sql_stacktrace_without_magic_tag()
+	{
+		def sep = System.getProperty("line.separator")
+		def r = o.get_sql_stacktrace(new ArrayList(["hello", "world", "iam", "evil", "jared"]), 3, 2, 0)
+		assertEquals(["world", "iam", "evil"], r.lines)
+		assertNull(r.file)
+	}
+
+	void test_get_sql_stacktrace_with_overflow()
+	{
+		def sep = System.getProperty("line.separator")
+		def r = o.get_sql_stacktrace(new ArrayList(["hello", "world", "iam", "evil", "jared"]), 5, 2, 2)
+		assertEquals(["iam", "evil", "jared"], r.lines)
+		assertNull(r.file)
+	}
+
+	void test_get_sql_stacktrace_with_magic_tag()
+	{
+		def sep = System.getProperty("line.separator")
+		def r = o.get_sql_stacktrace(new ArrayList(["hello", "world", "iam", "-- db-migrator:FILE:my.file", "evil", "jared"]), 4, 2, 0)
+		assertEquals(["iam", "-- db-migrator:FILE:my.file", "evil"], r.lines)
+		assertEquals("my.file", r.file)
+	}
 }

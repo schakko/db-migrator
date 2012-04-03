@@ -62,7 +62,7 @@ class Applier {
 				def inFile = new File(unapplied_migrations[key])
 				println "\033[1;33m[migration] " + total_migrations + " / " + size + " " + inFile.getName() + " scheduled for applying\033[0m"
 				def content = inFile.readLines()
-				pw.println("-- " + inFile.getName())
+				pw.println("-- db-migrator:FILE:" + inFile.getAbsolutePath())
 
 				content.each{line -> 
 					pw.println(line)

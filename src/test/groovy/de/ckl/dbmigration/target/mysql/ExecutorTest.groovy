@@ -35,4 +35,11 @@ class ExecutorTest extends GroovyTestCase {
 		assertTrue(r.contains("--verbose"))
 		assertTrue(r.contains("--execute=cmd"))
 	}
+
+	void test_get_linenumber_of_error()
+	{
+		assertEquals(0, o.get_linenumber_of_error("asdad asdasd"))
+		def err = " ERROR 1146 (42S02) at line 1121 in file: '/tmp/migration9211691449145648009.sql': Table 'asd.dd' doesn't exist"
+		assertEquals(1121, o.get_linenumber_of_error(err))
+	}
 }

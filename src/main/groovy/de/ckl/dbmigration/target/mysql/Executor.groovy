@@ -95,4 +95,19 @@ class Executor {
 
 		return exec(build_exec_command(command))
 	}
+
+	/**
+	 * Returns the line in which the error occured
+	 * @param string error
+	 * @return integer
+	 */
+	def get_linenumber_of_error(error) {
+		def matcher = (error =~ /ERROR .* at line (\d+)./)
+		if (matcher) {
+			if (matcher.count > 0) { 
+				return matcher[0][1].toInteger()
+		}
+}
+		return 0
+	}
 }
