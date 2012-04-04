@@ -33,7 +33,7 @@ class Migrator {
 	 */
 	def run() {
 		def dirs = directories.split(separatorPath)
-		def version = dbinterface.find_latest_migration()
+		def version = dbinterface.find_latest_migration(), use_version = version
 		
 		def stack = []
 		
@@ -45,7 +45,11 @@ class Migrator {
 		
 		for (pathdef in stack) {
 			println "[migration] Preparing directory '" + pathdef.dir.getName() + "'"
-			def candidates = strategy.find_unapplied_migrations_since(version, pathdef.dir, guard)
+			
+			// if latest file should be used, the latest migration inside the database is not relevant
+			use_version = pathdef.latest_only ? (new Version()) : version
+  
+			def candidates = strategy.find_unapplied_migrations_since(use_version, pathdef.dir, guard)
 			
 			applier.prepare(candidates, pathdef.latest_only, pathdef.sql_insert_migration)
 		}
@@ -81,8 +85,10 @@ class Migrator {
 				println ""
 			}
 
-			println "\033[1;31m[error] SQL-script has not been deleted for debugging purposes (" + applier.tmpFile.getAbsolutePath() + ")\033[0m"
+			println "\033[1;31m[error] SQL-script has not been deleted for debugging purposes (" + applier.tmpFile.getAbsolutePath() + ")"
 		}
+
+		print "\033[0m"
 	}
 
 	def get_sql_stacktrace(lines, idx, lines_before, lines_after) {

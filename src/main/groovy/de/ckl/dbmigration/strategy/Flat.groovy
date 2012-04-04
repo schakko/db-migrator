@@ -29,11 +29,11 @@ class Flat {
 				name.find(/([-|_])(\d*)/) { match, sep, arg -> _minor = arg }
 
 				def file_version = [major: _major, minor: _minor] as Version
-
+println file.getAbsolutePath()
 				// suffix allowed or other constraints?
 				if (guard.is_migration_allowed(file, version, file_version)) {
 					r[file_version] = file.getAbsolutePath()
-					println "[migration] " + name + " is a potentiaal candidate for migration"
+					println "[migration] " + name + " is a potential candidate for migration"
 				}
 		}
 		
