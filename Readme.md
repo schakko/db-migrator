@@ -109,6 +109,31 @@ Shell script usage
 		`$EXEC $DIR/fixtures/unittest,latest`
 	fi
 
+Usage with Zend Framework
+-------------------------
+db-migrator provides a simple interface for .ini files which can be used for Zend Framework applications.
+Every option in your command line can be replaced with a settings key inside your application.ini or routes.ini.
+To use this feature, you must provide the parameter -i - an absolute path to your ini file.
+
+	#!/bin/sh
+	SECTION="production"
+	DBMIGRATOR=/path/to/migrate-mysql.groovy
+	DIR=`dirname $0`
+
+	if [ "$1" = "testing" ]; then
+	        SECTION="testing"
+	fi
+
+	EXEC="groovy -cp `dirname $DBMIGRATOR` $DBMIGRATOR  -i $DIR/../application/configs/application.ini -x $SECTION -d \${resources.db.params.dbname} -h \${resources.db.params.host} -u \${resources.db.params.username} -p \${resources.db.params.password}"
+	R=`$EXEC "$DIR/migrations,all,true;$DIR/fixtures/coredata,all,true"`
+
+	echo -e "$R"
+
+	if [ "$1" = "testing" ]; then
+        	R=`$EXEC $DIR/fixtures/unittest,latest,false`
+        	echo -e "$R"
+	fi
+
 
 Internals
 ---------
