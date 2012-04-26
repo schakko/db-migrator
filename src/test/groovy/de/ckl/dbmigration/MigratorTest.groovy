@@ -1,11 +1,13 @@
 package de.ckl.dbmigration
 import groovy.util.GroovyTestCase
+import de.ckl.dbmigration.strategy.Flat
 
 class MigratorTest extends GroovyTestCase {
 	def o = null
-	
+
 	void setUp() {
 		o = new Migrator()
+		o.guard = new Guard()
 	}
 	
 	void test_create_dir_element_handlesInvalidDir()
@@ -62,4 +64,33 @@ class MigratorTest extends GroovyTestCase {
 		assertEquals(["iam", "-- db-migrator:FILE:my.file", "evil"], r.lines)
 		assertEquals("my.file", r.file)
 	}
+
+	void test_merge_migrations_from_directories()
+	{
+		def pathdef = [o.create_dir_element('../fixtures/merge_directories/unittest'),
+					o.create_dir_element('../fixtures/merge_directories/coredata'),
+					o.create_dir_element('../fixtures/merge_directories/migrations')]
+		o.strategy = new Flat()
+		def r = o.merge_migrations_from_directories(pathdef, new Version())
+		assertEquals(7, r.size())
+		def v = new Version(201206060001)
+		assertTrue(r[v].path.endsWith("conflict.sql"))
+	}
+
+	void test_merge_migrations_from_directories_correctOrderLatestOnly()
+	{
+		def pathdef = [o.create_dir_element('../fixtures/merge_directories/unittest'),
+					o.create_dir_element('../fixtures/merge_directories/coredata'),
+					o.create_dir_element('../fixtures/merge_directories/migrations,latest,true')]
+		o.strategy = new Flat()
+		def r = o.merge_migrations_from_directories(pathdef, new Version())
+
+		assertEquals(4, r.size())
+
+		assertFalse(r.containsKey(new Version(201201010001)))
+		assertFalse(r.containsKey(new Version(201201010002)))
+		assertFalse(r.containsKey(new Version(201201040001)))
+		assertTrue(r[new Version(201206060001)].path.endsWith("conflict.sql"))
+	}
+
 }

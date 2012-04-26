@@ -40,25 +40,18 @@ class Migrator {
 		for (pathdef in dirs) {
 			stack.push(create_dir_element(pathdef))
 		}
-			
-		applier.begin()
 		
-		for (pathdef in stack) {
-			println "[migration] Preparing directory '" + pathdef.dir.getName() + "'"
-			
-			// if latest file should be used, the latest migration inside the database is not relevant
-			use_version = pathdef.latest_only ? (new Version()) : version
-  
-			def candidates = strategy.find_unapplied_migrations_since(use_version, pathdef.dir, guard)
-			
-			applier.prepare(candidates, pathdef.latest_only, pathdef.sql_insert_migration)
-		}
-		
-		if (applier.total_migrations == 0) {
+		def merged_migrations = merge_migrations_from_directories(stack, version)
+	
+		if (merged_migrations.size() == 0) {
+			println "\033[1;32m[migration] no migrations available - project is up-to-date :-) \033[0m"
 			return
 		}
 
-		try {		
+		applier.begin()
+		applier.prepare(merged_migrations)
+
+		try {
 			applier.commit()
 			applier.cleanup()
 			println "\033[1;32m[migration] " + applier.total_migrations + " migrations applied. Project is now up-to-date :-)"
@@ -120,6 +113,52 @@ class Migrator {
 		return ["lines": output, "file": referenceFile, "beginline": ++beginline]
 	}
 	
+	/**
+	 * Merges multiple directories together so that one hashmap with all versions to apply is returned
+	 * @param array of pathdef
+	 * @param version current Version
+	 * @return hash[Version:path]
+	 */
+	def merge_migrations_from_directories(directories, version) {
+		def r = [:]
+
+		for (pathdef in directories) {
+			println "[merging] Searching directory '" + pathdef.dir.getName() + "'"
+			
+			// if latest file should be used, the latest migration inside the database is not relevant
+			def use_version = pathdef.latest_only ? (new Version()) : version
+  
+			def candidates = strategy.find_unapplied_migrations_since(use_version, pathdef.dir, guard)
+			
+			def ks = candidates.keySet().sort { a, b -> a.isHigherThan(b) ? 1 : -1}
+			def versions = [:]
+		
+			if (ks.size() == 0) {
+				continue
+			}
+
+			if (pathdef.latest_only) { 
+				println "[migration] only the latest migration will be applied"
+				def latest_version = ks.pop()
+
+				versions[latest_version] = candidates[latest_version]
+			} else {
+				versions = candidates
+			}
+
+			versions.each { key, value -> 				
+				if (r.containsKey(key)) {
+					println "\033[1;33m[merging] You have a duplicate in both directories: " + r[key].path + " <-> " + value + ". First one will be used. \033[0m"
+				}
+				else {
+					r[key] = [path:value, sql_insert_migration: pathdef.sql_insert_migration]
+				}
+			}
+		}
+
+		return r
+	}
+
 	/** 
 	 * @param pathdef a path definition which must have the format "path[,range[add_insert]]". 
 	 *				"range" can be "all" (apply *every* migration since the installed migration)

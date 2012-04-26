@@ -8,6 +8,15 @@ class Version {
 	static minor_maxlength = 4
 	private version = null
 
+	public Version()
+	{
+	}
+
+	public Version(BigInteger _version)
+	{
+		version = _version
+	}
+
 	/**
 	 * @return BigInteger a version number
 	 */
@@ -32,6 +41,22 @@ class Version {
 	 * @return
 	 */
 	def String toString() {
+		return get_version()
+	}
+
+	def boolean equals(obj) {
+		if (obj == null) {
+			return false
+		}
+
+		if (!(obj instanceof Version)) {
+			return false
+		}
+
+		return this.toString().equals(obj.toString())
+	}
+	
+	def int hashCode() {
 		return get_version()
 	}
 }

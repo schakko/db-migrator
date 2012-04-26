@@ -23,7 +23,7 @@ Please take a look at
 to get an idea why this is useful ;-)
 
 Other tools
-----------
+-----------
 
  * http://www.liquibase.org
 
@@ -31,10 +31,20 @@ Other tools
 How to use?
 -----------
 Currently the db-migrator only supports MySQL DBMS but can be easily extended to support the DBMS of your choice.
-One important rule: you strictly need workflow and a directory/file name structure for migration scripts.
+One important rule: you strictly need a defined workflow and a directory/file name structure for migration scripts.
 db-migrator provides two strategies which are most commonly used.
 
-1. Flat structure
+db-migrator, by default, only defines two rules: 
+
+ * Every migration file *must* begin with the format "yyyymmdd-ddd". The first part defines the date, the second a incremental number. Both together defines the *version*. Everything after the incremental number can be defined as you like.
+ * Every *version must* be unique. The migration files "20120426-001_migration.sql" and "20120426-001_unittest.sql" are *not* unique. "20120426-001_migration.sql" and "20120427-001_migration.sql" are unqiue! If you break this rule, db-migrator will throw a warning and the first found migration is used.
+
+
+
+Strategies
+----------
+
+### Flat structure ###
 Your migration scripts must reside in one directory, for example
 
 	/migrations
@@ -42,13 +52,13 @@ Your migration scripts must reside in one directory, for example
 		/20120308-001_blah.sql
 		/20120308-002_blah.sql
 	/views
-		/20120307-001_v1.sql
-		/20120308-002_v2.sql
+		/20120307-101_v1.sql
+		/20120308-102_v2.sql
 	/coredata
-		/20120305-001_bla.sql
-		/20120307-001_data.sql
+		/20120305-201_bla.sql
+		/20120307-201_data.sql
 	/fixtures
-		/20120307-001_fixtures.sql
+		/20120307-901_fixtures.sql
 
 To apply every (!) script from current installed migration to the newest available, you must use
 
@@ -73,7 +83,7 @@ If you want to apply a migration over more than one directory, you must separate
 
 Important: By default you must use the filename convention yyyymmdd-<number>bla.sql
 
-2. Hierarchial structure
+### Hierarchial structure ###
 Your migration scripts resides in subdirectory:
 
 	/migrations
