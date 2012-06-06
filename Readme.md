@@ -17,7 +17,7 @@ Please take a look at
  
  * http://www.codinghorror.com/blog/2008/02/get-your-database-under-version-control.html
  * http://odetocode.com/blogs/scott/archive/2008/01/30/three-rules-for-database-work.aspx
- * http://wap.ecw.de/archives/1665
+ * http://www.schakko.de/2011/12/23/databases-in-developers-environment-versioning-and-migrations/
  * http://blog.schauderhaft.de/2012/01/15/tipps-for-testing-database-code/
  
 to get an idea why this is useful ;-)
@@ -73,7 +73,7 @@ To apply only the latest script for coredata, you must use
 Only the latest available (20120307-001_data.sql) migration script will be applied.
 Your SQL scripts should contain a DELETE FROM * at the beginning of the SQL script to get into a consistent state
 
-To automatically install the migration without writing an INSET INTO migrations(...) at the end of every migration script, you must append a true after the directory
+To automatically install the migration without writing an INSERT INTO migrations(...) at the end of every migration script, you must append a true after the directory
 
 	groovy <path-to/>migrate-mysql -u user -p password -d database --strategy=flat ./coredata,latest,true
 

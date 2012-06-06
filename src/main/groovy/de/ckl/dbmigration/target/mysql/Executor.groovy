@@ -36,12 +36,14 @@ class Executor {
 			r.push(args)
 		}
 
+		// --vertical => Print the output of a query (rows) vertically 
 		r.push("--vertical")
 
 		if (verbose) {
 			r.push("--verbose")
 		}
 		
+		// --execute => Executes given SQL command
 		r.push('--execute=' + cmd) 
 
 		r.push(database)
@@ -55,6 +57,7 @@ class Executor {
 	 * @return Output from command line
 	 */
 	def exec_file(path) {
+		// \.source executes the given file; piping does not always work
 		return exec(build_exec_command("\\.source " + path, true)) 
 	}
 	
@@ -106,8 +109,9 @@ class Executor {
 		if (matcher) {
 			if (matcher.count > 0) { 
 				return matcher[0][1].toInteger()
+			}
 		}
-}
+
 		return 0
 	}
 }

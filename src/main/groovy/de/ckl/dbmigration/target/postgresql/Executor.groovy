@@ -14,6 +14,7 @@ class Executor {
 		def r = []
 		r.push(command)
 		
+		// -F => Set field separaotr, default is "|"
 		r.push("-F=';'")
 
 		if (host) {
@@ -24,7 +25,8 @@ class Executor {
 			r.push("--username=" + username)
 		}
 
-		if (!password)	{				
+		if (!password)	{
+			// -w => never ask for password
 			r.push("-w")
 		}
 		
@@ -60,6 +62,7 @@ class Executor {
 		println "[command] executing: " + cmd
 
 		// sending the password through a stream does not work because of some weird reasons
+		// we have to set the environment variable PGPASSWORD (as described in man page) to pass the password to the SQL command
 		def proc = (password) ? (cmd.execute(['PGPASSWORD=' + password], new File('.'))) : (cmd.execute())
 
 		def text = proc.text

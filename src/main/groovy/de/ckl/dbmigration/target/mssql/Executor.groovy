@@ -14,11 +14,13 @@ class Executor {
 		def r = []
 		r.push(command)
 		
+		// -S => server
 		if (host) {
 			r.push("-S " + host)
 		}
 		
 		if (username) {
+			// -U => logon ID
 			r.push("-U " + username)
 
 			if (password) {
@@ -26,7 +28,7 @@ class Executor {
 			}
 		
 		} else {
-			// if no username is set, use trusted connection
+			// if no username is set, use trusted connection (-E)
 			r.push("-E")
 		}
 		
@@ -36,6 +38,7 @@ class Executor {
 			r.push("-V 10")
 		}
 		
+		// -d => use database name
 		if (database) {
 			r.push("-d " + database)
 		}
@@ -52,6 +55,7 @@ class Executor {
 	def build_exec_command(cmd, verbose = false) {
 		def r = build_exec_command_default(verbose)
 		
+		// -Q => execute SQL command and exit
 		r.push("-Q " + cmd)
 
 		return r
@@ -64,6 +68,7 @@ class Executor {
 	 */
 	def exec_file(path) {
 		def sb = build_exec_command_default(verbose)
+		// -i => path to SQL file
 		sb.append(" -i ")
 		sb.append(path)
 

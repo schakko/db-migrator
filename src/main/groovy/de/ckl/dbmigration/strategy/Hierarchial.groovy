@@ -7,6 +7,7 @@ class Hierarchial {
 		
 		dir.eachDir{
 			majorDirs ->	
+				// TODO Implement me!
 				def name = file.getName(), major = name.find(/(\d{$Version.major_maxlength})/), minor = '';
 				name.find(/([-|_])(\d{1,$Version.minor_maxlength})/) { match, sep, _minor -> minor = _minor }
 
