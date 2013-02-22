@@ -49,7 +49,7 @@ class DBInterface {
 				throw new Exception("Could not filter output")
 			}
 
-			if (e.getMessage().split("\n")[0].matches(/(.*)relation(.*)does not exist/)) {
+			if (e.getMessage().split("\n")[0].matches(/(.*)[Rr]elation(.*)migration(.*)/)) {
 				println "[create] trying to create migration table ..."
 
 				try { 

@@ -64,34 +64,37 @@ class Executor {
 		def joinedCommand = cmd.join(" ")
 		def processBuilder = (System.getProperty("os.name").toLowerCase().contains("win")) ? new ProcessBuilder(joinedCommand) : new ProcessBuilder("sh", "-c", joinedCommand)
 		
-		processBuilder.redirectErrorStream(true);
-		
 		// sending the password through a stream does not work because of some weird reasons
 		// we have to set the environment variable PGPASSWORD (as described in man page) to pass the password to the SQL command
 		if (password) {
 			processBuilder.environment().put("PGPASSWORD", password)
 		}
-		def proc = null, text = "", err = ""
 		
+		processBuilder.environment().put("ON_ERROR_STOP", "1")
+		processBuilder.redirectErrorStream(true)
+		
+		def proc = null, text = "", err = ""
+
 		try {
 			proc = processBuilder.start()
+			proc.waitFor()
 			text = proc.text
 			err = proc.err.text
-			proc.waitFor()
-		
-			if (proc.exitValue()) {
-				throw new Exception("Wrong exit value from command")
-			}
 		}
 		catch (Exception e) {
-			if (err)
-				throw new Exception(e.getMessage() + ": " + err)
-			else
-				throw new Exception(e.getMessage() + ": Command did not exit normal but although did not return any error text. Is the executed command correct? Normal text stream follows:\n" + text)
+			println joinedCommand + " exits with value: " + proc.exitValue()
+		
+			if (proc.exitValue() > 0) {
+				if (err)
+					throw new Exception(e.getMessage() + ": " + err)
+				else
+					throw new Exception(e.getMessage() + ": Command did not exit normal but although did not return any error text. Is the executed command correct? Normal text stream follows:" + text)
+			}
 		}
 		
 		return text
     }
+
 
 	
 	/**
