@@ -8,7 +8,7 @@ import de.ckl.dbmigration.*
 class Parser extends AbstractParser {
 	def create_custom_opts(cli) {
 		// overwrite some help texts and defaults
-		cli.u(args:1, longOpt:'password', argName:'database-password', 'Password will be passed via environment variable PGPASSWORD; this could be security issue on some systems')
+		cli.p(args:1, longOpt:'password', argName:'database-password', 'Password will be passed via environment variable PGPASSWORD; this could be security issue on some systems')
 		return cli
 	}
 	
