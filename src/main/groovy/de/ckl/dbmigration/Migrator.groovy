@@ -126,7 +126,7 @@ class Migrator {
 			println "[merging] Searching directory '" + pathdef.dir.getName() + "'"
 			
 			// if latest file should be used, the latest migration inside the database is not relevant
-			def use_version = pathdef.latest_only ? (new Version()) : version
+			def use_version = (pathdef.latest_only || version == null) ? (new Version()) : version
   
 			def candidates = strategy.find_unapplied_migrations_since(use_version, pathdef.dir, guard)
 			
