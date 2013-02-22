@@ -58,30 +58,41 @@ class Executor {
 	 * @return String text from STDOUT
 	 * @throws Exception if exitValue != 0
 	 */
-	def exec(cmd) {
+    def exec(cmd) {
 		println "[command] executing: " + cmd
-
+		
+		def joinedCommand = cmd.join(" ")
+		def processBuilder = (System.getProperty("os.name").toLowerCase().contains("win")) ? new ProcessBuilder(joinedCommand) : new ProcessBuilder("sh", "-c", joinedCommand)
+		
+		processBuilder.redirectErrorStream(true);
+		
 		// sending the password through a stream does not work because of some weird reasons
 		// we have to set the environment variable PGPASSWORD (as described in man page) to pass the password to the SQL command
-		def proc = (password) ? (cmd.execute(['PGPASSWORD=' + password], new File('.'))) : (cmd.execute())
-
-		def text = proc.text
-		def err = proc.err.text
+		if (password) {
+			processBuilder.environment().put("PGPASSWORD", password)
+		}
+		def proc = null, text = "", err = ""
 		
-		proc.getErrorStream().close()
-		proc.getInputStream().close()
-		proc.getOutputStream().close()
+		try {
+			proc = processBuilder.start()
+			text = proc.text
+			err = proc.err.text
+			proc.waitFor()
 		
-		proc.waitFor()
-		
-		if (proc.exitValue())
+			if (proc.exitValue()) {
+				throw new Exception("Wrong exit value from command")
+			}
+		}
+		catch (Exception e) {
 			if (err)
-				throw new Exception(err)
-			else 
-				throw new Exception("Command did not exit normal but although did not return any error text. Is the executed command correct? Normal text stream follows:\n" + text)
+				throw new Exception(e.getMessage() + ": " + err)
+			else
+				throw new Exception(e.getMessage() + ": Command did not exit normal but although did not return any error text. Is the executed command correct? Normal text stream follows:\n" + text)
+		}
 		
 		return text
-	}
+    }
+
 	
 	/**
 	 * Executes a single command
