@@ -86,7 +86,7 @@ class Executor {
 		
 			if (proc.exitValue() > 0) {
 				if (err)
-					throw new Exception(e.getMessage() + ": " + err)
+						throw new Exception(e.getMessage() + ": " + err)
 				else
 					throw new Exception(e.getMessage() + ": Command did not exit normal but although did not return any error text. Is the executed command correct? Normal text stream follows:" + text)
 			}

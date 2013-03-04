@@ -27,14 +27,20 @@ class DBInterface {
 			def lines = executor.exec_command(sql_latest_migration).split("\n")
 			def _major = '0', _minor = '0'
 
-			if (lines.size() >= 4) {
-				if (!lines[0].matches(/\s+$sql_major_col\s+\|\s+$sql_minor_col\s+/)) {
-					throw new FilterException()
+			if (lines.size() > 0) {
+				if (lines.join(" ").toLowerCase().matches(/(.*)error(.*)/)) {
+					throw new Exception(lines.join(" "))
 				}
 				
-				lines[2].find(/\s+(\d*)\s+\|\s+(\d*)\s*/){ match, major, minor -> 
-					_major = major 
-					_minor = minor
+				if (lines.size() >= 4) {
+					if (!lines[0].matches(/\s+$sql_major_col\s+\|\s+$sql_minor_col\s+/)) {
+						throw new FilterException()
+					}
+					
+					lines[2].find(/\s+(\d*)\s+\|\s+(\d*)\s*/){ match, major, minor -> 
+						_major = major 
+						_minor = minor
+					}
 				}
 			}
 			
